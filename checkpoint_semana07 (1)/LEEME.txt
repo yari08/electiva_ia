@@ -1,0 +1,59 @@
+================================================================================
+  INSTRUCCIONES DE EJECUCIÓN - SEMANA 07: TOOL CALLING Y MCP
+  Ingeniería de Aplicaciones con IA
+================================================================================
+
+Este paquete contiene los archivos del taller de la Semana 07 para construir y 
+consumir servidores MCP (Model Context Protocol).
+
+--------------------------------------------------------------------------------
+1. CONTENIDO DEL PAQUETE (10 ARCHIVOS)
+--------------------------------------------------------------------------------
+- setup_postgres.sh         : Script Bash para despliegue de PostgreSQL en Docker (macOS / Linux).
+- setup_postgres.ps1        : Script PowerShell para despliegue de PostgreSQL en Docker (Windows).
+- setup_postgres.bat        : Script Batch CMD para despliegue en Windows sin restricciones.
+- init_db.sql               : Script SQL de creación y semilla de la base de datos 'domicilios'.
+- requirements.txt          : Dependencias Python (mcp<2, psycopg2-binary, pydantic).
+- cliente_mcp_postgres.py   : Cliente Python para interactuar con el servidor Postgres MCP.
+- servidor_mcp.py           : Servidor FastMCP propio con herramientas de descuento y cobertura.
+- probador_mcp_local.py     : Script de pruebas locales en STDIO para servidor_mcp.py.
+- mcp_config.json           : Configuración de ejemplo para Claude Desktop / Cursor.
+- README.md / LEEME.txt     : Instrucciones de ejecución paso a paso.
+
+--------------------------------------------------------------------------------
+2. REQUISITOS PREVIOS
+--------------------------------------------------------------------------------
+- Docker Desktop activo.
+- Python 3.10 o superior.
+- Node.js y npx instalados.
+
+--------------------------------------------------------------------------------
+3. PASO A PASO DE EJECUCIÓN
+--------------------------------------------------------------------------------
+
+[Paso 1] Desplegar PostgreSQL en Docker y Cargar Datos Iniciales:
+  - macOS / Linux:
+      chmod +x setup_postgres.sh
+      ./setup_postgres.sh
+
+  - Windows (PowerShell):
+      Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+      .\setup_postgres.ps1
+
+  - Windows (CMD):
+      setup_postgres.bat
+
+[Paso 2] Instalar dependencias de Python:
+  pip install -r requirements.txt
+
+[Paso 3] Probar el cliente de PostgreSQL MCP:
+  - macOS / Linux: python3 cliente_mcp_postgres.py
+  - Windows      : python cliente_mcp_postgres.py
+
+[Paso 4] Probar el servidor propio FastMCP localmente:
+  - macOS / Linux: python3 probador_mcp_local.py
+  - Windows      : python probador_mcp_local.py
+
+[Paso 5] Configurar Claude Desktop / Cursor (Opcional):
+  Utilizar la estructura del archivo mcp_config.json en su configuración local.
+================================================================================
