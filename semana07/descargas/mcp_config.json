@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "postgres-domicilios": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://curso:curso@localhost:55432/domicilios"
+      ]
+    },
+    "servidor-fastmcp-propio": {
+      "command": "python",
+      "args": [
+        "/RUTA/ABSOLUTA/A/TU/PROYECTO/semana07/descargas/servidor_mcp.py"
+      ]
+    }
+  }
+}
