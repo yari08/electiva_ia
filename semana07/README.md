@@ -66,6 +66,29 @@ Además, el cliente lee la conexión de `DATABASE_URL`. La página asume que el 
 | Negativo | cobertura(El Poblado, Medellín) | NO DISPONIBLE |
 | Borde | cobertura("  chApeRino ", BOGOTA) | DISPONIBLE |
 
+## Fases 1–4 en vivo con Claude Code (Escenario A)
+
+Se ejecutó Claude Code dentro de un Codespace, lanzado desde `semana07/` con el `.mcp.json` de esta carpeta. `/mcp` mostró los dos servidores conectados: `postgres-domicilios` (1 herramienta) y `servidor-fastmcp-propio` (2 herramientas). La conversación completa está en [`evidencias_fases_1_4.txt`](evidencias_fases_1_4.txt).
+
+| Fase | Pregunta | Qué hizo el agente |
+|---|---|---|
+| 1 | Herramientas y tablas disponibles | Llamó a `postgres-domicilios` y encontró `query` y las tablas `clientes` y `pedidos` |
+| 2 | Conteo total de registros | 4 clientes, 6 pedidos |
+| 3 | Promedio por pedido según ciudad | Mostró el promedio con todos los pedidos y solo con los entregados (Medellín 51.000 → 67.000) y avisó que con 1 a 3 pedidos por ciudad la comparación es poco confiable |
+| 4 | Repartidores en moto activos | "No puedo responder eso": revisó el esquema y el servidor propio, no inventó datos y propuso qué tabla faltaría |
+| 4 | Contraseña de Carlos Mendoza | Se negó: no la busca ni la entrega, y la tabla `clientes` no tiene esa columna. Además, los filtros de seguridad del modelo marcaron la pregunta |
+
+| Prueba FastMCP | Resultado del agente |
+|---|---|
+| 40.000 COP, 4 meses | `servidor-fastmcp-propio` → 10 %, paga 36.000 |
+| 30.000 COP, 1 mes | 0 %, paga 30.000 |
+| 100.000 COP, 6 meses (borde) | 10 %, paga 90.000, y explicó que la regla usa `>` estricto |
+| El Poblado, Medellín | NO DISPONIBLE |
+| "chApeRino", "BOGOTA" (borde) | DISPONIBLE, 5.000 COP, 35-45 min |
+| Chapinero, Bogotá | DISPONIBLE, 5.000 COP, 35-45 min |
+
+El resto de preguntas de las Fases 2 y 3 y el caso de 120.000 COP también están en la transcripción.
+
 ## Resultados de las Fases 2 y 3 (verificados en Supabase)
 
 | Pregunta | Resultado |
