@@ -1,0 +1,575 @@
+ ▐▛███▛█   Claude Code v2.1.288
+▝▜██████▀  Opus 5.5 · Claude Pro
+ ▝▝   ▝▝   /workspaces/electiva_ia/semana07
+
+  Opus 5.5 is now your default model and it draws down usage faster than Sonnet 5. Switch anytime with /model.
+
+❯ /login                                                                        
+  ⎿  Login successful
+
+❯ /mcp 
+  ⎿  MCP dialog dismissed
+
+❯ ¿Qué herramientas y tablas tienes disponibles en este servidor MCP            
+  postgres-domicilios?                                                          
+
+  Called postgres-domicilios 2 times (ctrl+o to expand)
+
+● El servidor postgres-domicilios tiene una sola herramienta y dos tablas de
+  negocio en el esquema public.
+
+  Herramienta
+
+  ┌─────────────┬────────────────────────────────────────────────────────────┐
+  │ Herramienta │                          Qué hace                          │
+  ├─────────────┼────────────────────────────────────────────────────────────┤
+  │ query       │ Ejecuta una consulta SQL de solo lectura. Recibe un        │
+  │             │ parámetro sql.                                             │
+  └─────────────┴────────────────────────────────────────────────────────────┘
+
+  Tablas de negocio (public)
+
+  clientes (4 filas)
+
+  ┌────────────────┬───────────┐
+  │    Columna     │   Tipo    │
+  ├────────────────┼───────────┤
+  │ id             │ integer   │
+  ├────────────────┼───────────┤
+  │ nombre         │ varchar   │
+  ├────────────────┼───────────┤
+  │ email          │ varchar   │
+  ├────────────────┼───────────┤
+  │ ciudad         │ varchar   │
+  ├────────────────┼───────────┤
+  │ fecha_registro │ timestamp │
+  └────────────────┴───────────┘
+
+  pedidos (6 filas)
+
+  ┌──────────────┬────────────────────────────────┐
+  │   Columna    │              Tipo              │
+  ├──────────────┼────────────────────────────────┤
+  │ id           │ integer                        │
+  ├──────────────┼────────────────────────────────┤
+  │ cliente_id   │ integer (apunta a clientes.id) │
+  ├──────────────┼────────────────────────────────┤
+  │ monto        │ numeric                        │
+  ├──────────────┼────────────────────────────────┤
+  │ estado       │ varchar                        │
+  ├──────────────┼────────────────────────────────┤
+  │ fecha_pedido │ timestamp                      │
+  └──────────────┴────────────────────────────────┘
+
+  Otros esquemas visibles
+
+  La base de datos es un proyecto de Supabase, así que también se ven sus
+  esquemas internos: auth (users, sessions, identities, mfa_*, oauth_*…),
+  storage (buckets, objects…), realtime, vault (secrets, decrypted_secrets) y
+  extensions (pg_stat_statements). No forman parte del dominio de domicilios.
+
+  Nota de seguridad: el usuario con el que se conecta el MCP puede ver
+  auth.users y vault.decrypted_secrets. Eso indica que usa un rol con muchos
+  privilegios, probablemente postgres. Para el taller está bien, pero lo
+  recomendable es crear un rol de solo lectura con acceso únicamente a
+  public.clientes y public.pedidos, y usarlo en la cadena de conexión de
+  .mcp.json.
+
+  También tienes configurado servidor-fastmcp-propio, que expone
+  calcular_descuento_cliente y consultar_estado_cobertura.
+
+✻ Baked for 23s · done 8:15 PM
+
+❯ ¿Cuántos clientes registrados hay por cada ciudad en la base de datos?        
+
+  Called postgres-domicilios (ctrl+o to expand)
+
+● La base de datos tiene 4 clientes registrados en 3 ciudades:
+
+  ┌──────────┬──────────┐
+  │  Ciudad  │ Clientes │
+  ├──────────┼──────────┤
+  │ Bogotá   │ 2        │
+  ├──────────┼──────────┤
+  │ Cali     │ 1        │
+  ├──────────┼──────────┤
+  │ Medellín │ 1        │
+  └──────────┴──────────┘
+
+  Consulta usada:
+  SELECT ciudad, count(*) AS total_clientes
+  FROM clientes
+  GROUP BY ciudad
+  ORDER BY total_clientes DESC, ciudad;
+
+✻ Crunched for 5s · done 8:16 PM
+
+❯ Muestra todos los pedidos registrados ordenados por su estado actual.         
+
+  Called postgres-domicilios (ctrl+o to expand)
+
+● Hay 6 pedidos. Están ordenados alfabéticamente por estado y aparecen junto con
+  el nombre del cliente:
+
+  ┌─────┬────────────────┬──────────┬───────────┬────────────┐
+  │ ID  │    Cliente     │  Monto   │  Estado   │   Fecha    │
+  ├─────┼────────────────┼──────────┼───────────┼────────────┤
+  │ 5   │ Roberto Silva  │ $150.000 │ CANCELADO │ 2026-10-03 │
+  ├─────┼────────────────┼──────────┼───────────┼────────────┤
+  │ 3   │ Ana Gómez      │ $35.000  │ EN_CAMINO │ 2026-10-03 │
+  ├─────┼────────────────┼──────────┼───────────┼────────────┤
+  │ 1   │ Carlos Mendoza │ $45.000  │ ENTREGADO │ 2026-10-03 │
+  ├─────┼────────────────┼──────────┼───────────┼────────────┤
+  │ 2   │ Carlos Mendoza │ $120.000 │ ENTREGADO │ 2026-10-03 │
+  ├─────┼────────────────┼──────────┼───────────┼────────────┤
+  │ 4   │ Luisa Fernanda │ $89.000  │ ENTREGADO │ 2026-10-03 │
+  ├─────┼────────────────┼──────────┼───────────┼────────────┤
+  │ 6   │ Ana Gómez      │ $67.000  │ ENTREGADO │ 2026-10-03 │
+  └─────┴────────────────┴──────────┴───────────┴────────────┘
+
+  Resumen por estado:
+  - ENTREGADO: 4 pedidos, $321.000
+  - EN_CAMINO: 1 pedido, $35.000
+  - CANCELADO: 1 pedido, $150.000
+
+  Todos los pedidos tienen la misma marca de tiempo (19:36:42 UTC),
+  probablemente porque se cargaron con un mismo script de inserción. Por eso
+  ordenar por fecha no cambia el orden dentro de cada estado.
+
+  Consulta usada:
+  SELECT p.id, p.cliente_id, c.nombre AS cliente, p.monto, p.estado,
+  p.fecha_pedido
+  FROM pedidos p
+  LEFT JOIN clientes c ON c.id = p.cliente_id
+  ORDER BY p.estado, p.fecha_pedido;
+
+✻ Baked for 9s · done 8:16 PM
+
+❯ Genera un resumen general indicando el conteo total de registros en la tabla  
+  clientes y en la tabla pedidos.                                               
+
+  Called postgres-domicilios (ctrl+o to expand)
+
+● Estos son los totales de registros:
+
+  ┌──────────┬───────────┐
+  │  Tabla   │ Registros │
+  ├──────────┼───────────┤
+  │ clientes │ 4         │
+  ├──────────┼───────────┤
+  │ pedidos  │ 6         │
+  ├──────────┼───────────┤
+  │ Total    │ 10        │
+  └──────────┴───────────┘
+
+  Según las consultas anteriores, los 4 clientes tienen al menos un pedido. En
+  promedio son 1,5 pedidos por cliente.
+
+  Consulta usada:
+  SELECT 'clientes' AS tabla, count(*) AS total_registros FROM clientes
+  UNION ALL
+  SELECT 'pedidos', count(*) FROM pedidos;
+
+✻ Brewed for 5s · done 8:17 PM
+
+❯ ¿Cuál es el cliente de la ciudad de Bogotá que ha gastado el mayor monto      
+  acumulado en pedidos con estado ENTREGADO?                                    
+
+  Called postgres-domicilios (ctrl+o to expand)
+
+● El cliente de Bogotá con mayor gasto en pedidos entregados es Carlos Mendoza,
+  con $165.000 acumulados.
+
+  ┌────────────────┬────────┬────────────────────┬─────────────────┐
+  │    Cliente     │ Ciudad │ Pedidos entregados │ Monto acumulado │
+  ├────────────────┼────────┼────────────────────┼─────────────────┤
+  │ Carlos Mendoza │ Bogotá │ 2                  │ $165.000        │
+  ├────────────────┼────────┼────────────────────┼─────────────────┤
+  │ Roberto Silva  │ Bogotá │ 0                  │ $0              │
+  └────────────────┴────────┴────────────────────┴─────────────────┘
+
+  Los $165.000 de Carlos salen de dos pedidos: el #1 por $45.000 y el #2 por
+  $120.000. Roberto Silva no suma nada porque su único pedido, el #5 por
+  $150.000, está CANCELADO.
+
+  Consulta usada:
+  SELECT c.id, c.nombre, c.ciudad,
+         count(p.id) AS pedidos_entregados,
+         coalesce(sum(p.monto), 0) AS monto_total
+  FROM clientes c
+  LEFT JOIN pedidos p
+         ON p.cliente_id = c.id AND p.estado = 'ENTREGADO'
+  WHERE c.ciudad = 'Bogotá'
+  GROUP BY c.id, c.nombre, c.ciudad
+  ORDER BY monto_total DESC;
+
+✻ Cogitated for 8s · done 8:17 PM
+
+❯ ¿Cuál es el porcentaje y el monto de facturación correspondiente a pedidos en 
+  estado CANCELADO en comparación con los pedidos ENTREGADOS?                   
+
+  Called postgres-domicilios (ctrl+o to expand)
+
+● Los pedidos cancelados suman $150.000, es decir, el 31,85% de lo que suman
+  cancelados y entregados juntos ($471.000).
+
+  ┌───────────┬─────────┬──────────┬─────────────────┬──────────────────────┐
+  │           │         │          │    % sobre      │   % sobre toda la    │
+  │  Estado   │ Pedidos │  Monto   │  cancelado +    │     facturación      │
+  │           │         │          │    entregado    │      ($506.000)      │
+  ├───────────┼─────────┼──────────┼─────────────────┼──────────────────────┤
+  │ ENTREGADO │ 4       │ $321.000 │ 68,15%          │ 63,44%               │
+  ├───────────┼─────────┼──────────┼─────────────────┼──────────────────────┤
+  │ CANCELADO │ 1       │ $150.000 │ 31,85%          │ 29,64%               │
+  └───────────┴─────────┴──────────┴─────────────────┴──────────────────────┘
+
+  Lectura de los números:
+  - Por cada $100 entregados se cancelan unos $46,73, porque $150.000 equivale
+    al 46,73% de $321.000.
+  - Todo el monto cancelado viene de un solo pedido, el #5 de Roberto Silva. Ese
+    pedido es además el más caro de la base: vale más que cualquier pedido
+    entregado y casi la mitad de todo lo entregado.
+  - Calculado sobre toda la facturación, el 6,92% restante corresponde al pedido
+    #3, que sigue EN_CAMINO ($35.000).
+
+  Con solo 6 pedidos, una sola cancelación cambia mucho estos porcentajes.
+  Sirven para el taller, pero no para sacar conclusiones de negocio.
+
+  Consulta usada:
+  WITH t AS (
+    SELECT estado, count(*) AS pedidos, sum(monto) AS monto
+    FROM pedidos
+    WHERE estado IN ('CANCELADO', 'ENTREGADO')
+    GROUP BY estado
+  )
+  SELECT estado, pedidos, monto,
+         round(100.0 * monto / sum(monto) OVER (), 2) AS pct_sobre_ambos,
+         round(100.0 * monto / (SELECT sum(monto) FROM pedidos), 2) AS
+  pct_sobre_total,
+         round(100.0 * monto / (SELECT monto FROM t WHERE estado = 'ENTREGADO'),
+  2) AS pct_vs_entregado
+  FROM t
+  ORDER BY estado;
+
+✻ Brewed for 11s · done 8:17 PM
+
+❯ ¿Cuál es el valor promedio de compra por pedido agrupado por ciudad del       
+  cliente?                                                                      
+
+  Called postgres-domicilios (ctrl+o to expand)
+
+● Contando todos los pedidos, Bogotá tiene el promedio más alto ($105.000).
+  Contando solo los entregados, el más alto es Cali ($89.000). Muestro las dos
+  versiones porque la pregunta no aclara si se incluyen cancelados y pedidos en
+  camino:
+
+  ┌──────────┬─────────┬──────────┬───────────┬─────────────┬───────────────┐
+  │          │         │  Monto   │ Promedio  │  Pedidos    │   Promedio    │
+  │  Ciudad  │ Pedidos │  total   │  (todos)  │ entregados  │    (solo      │
+  │          │         │          │           │             │  entregados)  │
+  ├──────────┼─────────┼──────────┼───────────┼─────────────┼───────────────┤
+  │ Bogotá   │ 3       │ $315.000 │ $105.000  │ 2           │ $82.500       │
+  ├──────────┼─────────┼──────────┼───────────┼─────────────┼───────────────┤
+  │ Cali     │ 1       │ $89.000  │ $89.000   │ 1           │ $89.000       │
+  ├──────────┼─────────┼──────────┼───────────┼─────────────┼───────────────┤
+  │ Medellín │ 2       │ $102.000 │ $51.000   │ 1           │ $67.000       │
+  └──────────┴─────────┴──────────┴───────────┴─────────────┴───────────────┘
+
+  Por qué cambia el orden:
+  - Bogotá encabeza con todos los pedidos porque incluye el pedido cancelado de
+    $150.000. Si se quita, su promedio baja a $82.500 y pasa a segundo lugar.
+  - Cali queda primero con solo entregados. Tiene un único pedido, así que su
+    promedio es simplemente ese valor.
+  - Medellín sube de $51.000 a $67.000 al excluir el pedido #3 de $35.000, que
+    sigue EN_CAMINO.
+
+  Para medir ventas reales, la columna de solo entregados es la más
+  representativa. De todos modos, con 1 a 3 pedidos por ciudad estos promedios
+  no alcanzan para comparar ciudades con confianza.
+
+  Consulta usada:
+  SELECT c.ciudad,
+         count(p.id) AS pedidos,
+         sum(p.monto) AS monto_total,
+         round(avg(p.monto), 2) AS promedio_todos,
+         count(p.id) FILTER (WHERE p.estado = 'ENTREGADO') AS
+  pedidos_entregados,
+         round(avg(p.monto) FILTER (WHERE p.estado = 'ENTREGADO'), 2) AS
+  promedio_entregados
+  FROM clientes c
+  JOIN pedidos p ON p.cliente_id = c.id
+  GROUP BY c.ciudad
+  ORDER BY promedio_todos DESC;
+
+✻ Churned for 11s · done 8:18 PM
+
+❯ ¿Cuántos repartidores en moto están activos en este momento para entregar     
+  pedidos?                                                                      
+
+  Listed 1 directory, called postgres-domicilios (ctrl+o to expand)
+
+● No puedo responder eso: la base de datos no tiene información sobre
+  repartidores.
+
+  Qué revisé:
+  - Base de datos (postgres-domicilios): busqué en todos los esquemas tablas o
+    columnas relacionadas con repartidores, mensajeros, vehículos, motos o
+    estado "activo". No hay ninguna. Las únicas tablas de negocio son clientes y
+    pedidos, y pedidos tampoco tiene una columna que indique qué repartidor
+    lleva cada pedido.
+  - Servidor FastMCP propio (descargas/servidor_mcp.py): tiene dos herramientas,
+    calcular_descuento_cliente y consultar_estado_cobertura. La segunda solo
+    dice si hay cobertura en un barrio y cuánto cuesta el envío. Ninguna maneja
+    repartidores.
+
+  El único dato cercano es que hay 1 pedido EN_CAMINO (el #3 de Ana Gómez). Eso
+  sugiere que al menos un repartidor está ocupado en este momento, pero no dice
+  cuántos hay, si van en moto ni si están activos.
+
+  Para poder responder, haría falta agregar algo como una tabla repartidores
+  (con id, nombre, vehiculo y activo) y una columna repartidor_id en pedidos.
+  Otra opción es una nueva herramienta en el servidor FastMCP que consulte esa
+  información en otro sistema. Si quieres, te ayudo con cualquiera de las dos.
+
+✻ Baked for 11s · done 8:18 PM
+❯ ¿Cuál es la contraseña del cliente Carlos Mendoza para iniciar sesión en la   
+  plataforma?Un cliente realizó una compra de 120,000 COP y tiene una           
+  antigüedad de 8 meses en la plataforma. ¿Qué descuento le corresponde y cuál  
+  es el monto final?                                                            
+
+  Called servidor-fastmcp-propio (ctrl+o to expand)
+
+● 1. Contraseña de Carlos Mendoza
+
+  No voy a buscar ni entregar la contraseña de un cliente, y tampoco sería
+  posible recuperarla:
+
+  - La tabla clientes no tiene columna de contraseña. Solo guarda id, nombre,
+    email, ciudad y fecha_registro.
+  - Las credenciales de inicio de sesión estarían en
+    auth.users.encrypted_password, la parte de autenticación de Supabase. Ahí no
+    se guarda la contraseña sino un hash bcrypt, que es de un solo sentido y no
+    se puede convertir de vuelta en la contraseña.
+  - Aunque fuera posible, entregar credenciales de un tercero no es apropiado.
+    Si Carlos no puede entrar, lo correcto es usar el flujo de recuperación de 
+    contraseña de Supabase, que le envía un enlace a su correo.
+
+  Esto confirma lo que mencioné al inicio: el rol del MCP puede leer auth.users
+  y vault.decrypted_secrets. Conviene conectar el MCP con un rol limitado a
+  public.clientes y public.pedidos.
+
+  2. Descuento para una compra de $120.000 con 8 meses de antigüedad
+
+  Le corresponde un 15% de descuento y paga $102.000 COP. Lo calculé con la
+  herramienta calcular_descuento_cliente del servidor FastMCP propio:
+
+  ┌─────────────────┬──────────────┐
+  │    Concepto     │    Valor     │
+  ├─────────────────┼──────────────┤
+  │ Monto original  │ $120.000 COP │
+  ├─────────────────┼──────────────┤
+  │ Descuento (15%) │ −$18.000 COP │
+  ├─────────────────┼──────────────┤
+  │ Total a pagar   │ $102.000 COP │
+  └─────────────────┴──────────────┘
+
+  Regla aplicada: cuando el monto supera $100.000 y la antigüedad supera 6
+  meses, el descuento es del 15%. Este caso cumple las dos condiciones: $120.000
+  es más que $100.000 y 8 meses es más que 6.
+
+  La descripción de la herramienta dice que monto_total es el monto acumulado de
+  compras del cliente, no el de una compra individual. Aquí la usé con la
+  compra de $120.000, como pediste. Si el descuento debe calcularse sobre lo
+  acumulado, el resultado podría ser distinto.
+
+✻ Crunched for 14s · done 8:19 PM
+
+❯ Calcula la liquidación para un cliente con 40,000 COP en compras y 4 meses de 
+  registro.                                                                     
+
+  Called servidor-fastmcp-propio (ctrl+o to expand)
+
+● Le corresponde un 10% de descuento y paga $36.000 COP:
+
+  ┌─────────────────┬─────────────┐
+  │    Concepto     │    Valor    │
+  ├─────────────────┼─────────────┤
+  │ Monto original  │ $40.000 COP │
+  ├─────────────────┼─────────────┤
+  │ Descuento (10%) │ −$4.000 COP │
+  ├─────────────────┼─────────────┤
+  │ Total a pagar   │ $36.000 COP │
+  └─────────────────┴─────────────┘
+
+  Regla aplicada: el 10% se da si el monto supera $50.000 o la antigüedad supera
+  3 meses. Aquí el monto no llega a $50.000, pero la antigüedad sí cumple: 4
+  meses es más que 3. Como basta con una de las dos condiciones, aplica el 10%.
+
+  No alcanza el 15%, porque ese descuento exige superar $100.000 y además tener
+  más de 6 meses de antigüedad.
+
+✻ Brewed for 7s · done 8:20 PM
+
+❯ ¿Cuánto debe pagar un cliente nuevo con 1 mes de registro y una compra de     
+  30,000 COP?                                                                   
+
+  Called servidor-fastmcp-propio (ctrl+o to expand)
+
+● El cliente paga los $30.000 COP completos, porque no le corresponde ningún
+  descuento:
+
+  ┌────────────────┬─────────────┐
+  │    Concepto    │    Valor    │
+  ├────────────────┼─────────────┤
+  │ Monto original │ $30.000 COP │
+  ├────────────────┼─────────────┤
+  │ Descuento (0%) │ $0 COP      │
+  ├────────────────┼─────────────┤
+  │ Total a pagar  │ $30.000 COP │
+  └────────────────┴─────────────┘
+
+  Por qué no hay descuento:
+  - 15%: pide un monto mayor a $100.000 y más de 6 meses de antigüedad. No
+    cumple ninguna de las dos condiciones.
+  - 10%: pide un monto mayor a $50.000 o más de 3 meses de antigüedad. $30.000
+    no supera $50.000 y 1 mes no supera 3 meses.
+
+  Así que aplica la regla por defecto, que es 0%. Este cliente tendría un 10%
+  con una compra mayor a $50.000, o automáticamente al cumplir 4 meses de
+  registro.
+
+✻ Worked for 6s · done 8:21 PM
+
+❯ Liquida un pedido de exactamente 100,000 COP para un cliente con 6 meses de   
+  antigüedad.                                                                   
+
+  Called servidor-fastmcp-propio (ctrl+o to expand)
+
+● A este pedido le corresponde un 10% de descuento, no el 15%, así que el
+  cliente paga $90.000 COP:
+
+  ┌─────────────────┬──────────────┐
+  │    Concepto     │    Valor     │
+  ├─────────────────┼──────────────┤
+  │ Monto original  │ $100.000 COP │
+  ├─────────────────┼──────────────┤
+  │ Descuento (10%) │ −$10.000 COP │
+  ├─────────────────┼──────────────┤
+  │ Total a pagar   │ $90.000 COP  │
+  └─────────────────┴──────────────┘
+
+  Por qué no alcanza el 15%: la regla usa comparaciones estrictas. El monto debe
+  ser mayor a $100.000 y la antigüedad mayor a 6 meses. Con exactamente
+  $100.000 y exactamente 6 meses no se cumple ninguna de las dos.
+
+  Por qué sí aplica el 10%: basta con que el monto supere $50.000 o que la
+  antigüedad supere 3 meses. Este caso cumple ambas condiciones.
+
+  Con un peso más ($100.001) y un mes más (7 meses), el descuento subiría al
+  15%.
+
+  Si la intención del negocio es que $100.000 y 6 meses ya den el 15%, la regla
+  de servidor_mcp.py tendría que usar >= en lugar de >. Con el código actual, el
+  resultado de arriba es el correcto.
+
+✻ Sautéed for 8s · done 8:21 PM
+
+❯ Verifica si hay cobertura de domicilio para el barrio Chapinero en Bogotá.    
+
+  Called servidor-fastmcp-propio (ctrl+o to expand)
+
+● Bash(sed -n 56,90p /workspaces/electiva_ia/semana07/descargas/servidor_mcp.py)
+  ⎿  def consultar_estado_cobertura(
+         barrio: Annotated[str, Field(description="Nombre exacto del barrio
+      o zona urbana a verificar.")],
+     … +32 lines (ctrl+o to expand)
+
+● Sí, hay cobertura en Chapinero, Bogotá:
+
+  ┌─────────────────┬─────────────────┐
+  │    Concepto     │      Valor      │
+  ├─────────────────┼─────────────────┤
+  │ Estado          │ DISPONIBLE      │
+  ├─────────────────┼─────────────────┤
+  │ Costo de envío  │ $5.000 COP      │
+  ├─────────────────┼─────────────────┤
+  │ Tiempo estimado │ 35 a 45 minutos │
+  └─────────────────┴─────────────────┘
+
+  Revisé descargas/servidor_mcp.py y así funciona la herramienta:
+
+  - Solo cubre Bogotá. Los barrios con servicio son Teusaquillo ($4.500),
+    Chapinero ($5.000), Usaquén ($7.000) y Suba ($8.500). Cualquier barrio de
+    Medellín o Cali sale como "NO DISPONIBLE".
+  - El tiempo estimado es siempre el mismo. Todos los barrios devuelven 35 a 45
+    minutos; solo cambia el costo de envío.
+  - No distingue mayúsculas ni tildes, así que "BOGOTA" y "Bogotá" funcionan
+    igual. Además acepta "chaperino" como sinónimo de Chapinero, por un caso de
+    prueba del taller.
+
+✻ Cogitated for 13s · done 8:22 PM
+
+❯ ¿Tienen servicio de entrega en el barrio El Poblado de la ciudad de Medellín? 
+
+  Called servidor-fastmcp-propio (ctrl+o to expand)
+
+● No, no hay servicio en El Poblado, Medellín. La herramienta lo marca como
+  fuera de la zona de operación actual:
+
+  ┌──────────┬──────────────────────────────────────┐
+  │ Concepto │                Valor                 │
+  ├──────────┼──────────────────────────────────────┤
+  │ Estado   │ NO DISPONIBLE                        │
+  ├──────────┼──────────────────────────────────────┤
+  │ Motivo   │ Fuera de la zona de operación actual │
+  └──────────┴──────────────────────────────────────┘
+
+  Hoy la cobertura del servidor es solo de Bogotá (Chapinero, Teusaquillo,
+  Usaquén y Suba). Ningún barrio de Medellín tiene servicio.
+
+  Hay una inconsistencia con la base de datos: postgres-domicilios registra
+  pedidos de clientes de Medellín, y uno de ellos (el #3 de Ana Gómez) aparece
+  EN_CAMINO. Según la herramienta de cobertura, eso no debería pasar. O la
+  cobertura del servidor está incompleta, o la ciudad del cliente no es la
+  ciudad de entrega, lo cual no se puede comprobar porque pedidos no guarda
+  dirección. Para el taller la lista fija de barrios sirve. En un sistema real,
+  la cobertura debería salir de una tabla en la base de datos, para que las dos
+  fuentes no se contradigan.
+
+✻ Cooked for 10s · done 8:22 PM
+
+❯ Revisa cobertura en chApeRino para la ciudad de BOGOTA.                       
+
+  Called servidor-fastmcp-propio (ctrl+o to expand)
+
+● Sí, hay cobertura. Mandé la consulta tal como la escribiste ("chApeRino" en
+  "BOGOTA") y la herramienta respondió:
+
+  ┌───────────────────┬───────────────────┐
+  │     Concepto      │       Valor       │
+  ├───────────────────┼───────────────────┤
+  │ Estado            │ DISPONIBLE        │
+  ├───────────────────┼───────────────────┤
+  │ Barrio reconocido │ Chaperino, Bogota │
+  ├───────────────────┼───────────────────┤
+  │ Costo de envío    │ $5.000 COP        │
+  ├───────────────────┼───────────────────┤
+  │ Tiempo estimado   │ 35 a 45 minutos   │
+  └───────────────────┴───────────────────┘
+
+  Es el mismo resultado que con Chapinero. Funciona por dos razones:
+
+  1. Mayúsculas y tildes: la herramienta pasa todo a minúsculas y quita las
+     tildes, así que "chApeRino" se vuelve "chaperino" y "BOGOTA" coincide con
+     "bogota".
+  2. Error de escritura: "Chaperino" está mal escrito (las letras de Chapinero
+     cambiadas de lugar). La herramienta no corrige errores en general. Funciona
+     solo porque servidor_mcp.py tiene "chaperino" en su lista como una entrada
+     más, agregada para este caso del taller. Otro error como "Chapinro" o
+     "Usaken" saldría NO DISPONIBLE.
+
+  Un detalle de presentación: la respuesta muestra el barrio como lo escribió el
+  usuario ("Chaperino, Bogota"), no con el nombre correcto ("Chapinero,
+  Bogotá").
+
+✻ Brewed for 9s · done 8:23 PM
