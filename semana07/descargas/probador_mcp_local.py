@@ -48,8 +48,9 @@ async def main():
                 print(f"        {texto}\n")
 
             print(f"{len(CASOS) - fallos}/{len(CASOS)} casos correctos")
-            sys.exit(1 if fallos else 0)
+            return fallos
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    # sys.exit fuera de los async with: adentro, anyio lo envuelve en un traceback
+    sys.exit(1 if asyncio.run(main()) else 0)
