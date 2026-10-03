@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "postgres-domicilios": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${DATABASE_URL}"]
+    },
+    "servidor-fastmcp-propio": {
+      "command": "python",
+      "args": ["descargas/servidor_mcp.py"]
+    }
+  }
+}
